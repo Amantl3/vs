@@ -4,11 +4,13 @@ const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000; // ✅ important for Render
 
 // Middleware
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname))); // Serves index.html
+
+// ✅ Serve static files from the 'public' folder
+app.use(express.static(path.join(__dirname, 'public')));
 
 // SQLite database
 const db = new sqlite3.Database('./votes.db');
@@ -43,6 +45,11 @@ app.post('/api/vote', (req, res) => {
       }
     );
   });
+});
+
+// ✅ Catch-all to serve index.html by default (for root URL)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // Start server
